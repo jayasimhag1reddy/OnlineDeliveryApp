@@ -2,10 +2,10 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         intro();
         Scanner sc=new Scanner(System.in);
-        HomePage hm=new HomePage();
+        RegistrationAndLogin rl=new RegistrationAndLogin();
         while(true){
             try{
                 System.out.println("Type 1 : Registration");
@@ -14,10 +14,10 @@ public class Main {
                 System.out.println("Enter your choice");
                 int user_choice=sc.nextInt();
                 if (user_choice == 1) {
-                    hm.registration();
+                    rl.registration();
                 }
                 if (user_choice == 2) {
-                    hm.login();
+                    rl.login();
                 }
                 if (user_choice == 3) {
                     break;
@@ -27,7 +27,8 @@ public class Main {
                 }
             }
             catch (InputMismatchException e){
-                System.out.println(e);
+                System.out.println("Invalid Choice Please Enter a valid choice(1/2/3)");
+                sc.next();
             }
         }
     }
