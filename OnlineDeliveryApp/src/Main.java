@@ -5,7 +5,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         intro();
         Scanner sc=new Scanner(System.in);
-        RegistrationAndLogin rl=new RegistrationAndLogin();
+        Homepage hp=new Homepage();
         while(true){
             try{
                 System.out.println("Type 1 : Registration");
@@ -14,10 +14,10 @@ public class Main {
                 System.out.println("Enter your choice");
                 int user_choice=sc.nextInt();
                 if (user_choice == 1) {
-                    rl.registration();
+                    hp.registration();
                 }
                 if (user_choice == 2) {
-                    rl.login();
+                    hp.login();
                 }
                 if (user_choice == 3) {
                     break;

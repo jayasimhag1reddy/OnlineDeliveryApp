@@ -1,24 +1,48 @@
-import com.sun.source.tree.WhileLoopTree;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
 public class Homepage {
-    Scanner sc;
-    Item it;
-    Customer cs;
+    private Scanner sc=new Scanner(System.in);
+    private ItemDetails it=new ItemDetails();
+    private CustomerDetails cd=new CustomerDetails();
     private double cost=0.0;
-    private List<ItemList> order;
+    private List<ItemList> order=new ArrayList<>();
     public Homepage(){
-        sc=new Scanner(System.in);
-        it=new Item();
-        cs=new Customer();
-        order=new ArrayList<>();
 
     }
-    public void display(){
+    public void registration() {
+        System.out.println("Enter UserID: ");
+        String userid=sc.nextLine();
+        System.out.println("Enter Password: ");
+        String password=sc.nextLine();
+        System.out.println("Enter your Name: ");
+        String name=sc.nextLine();
+        System.out.println("Enter your Phone: ");
+        String phone=sc.nextLine();
+        System.out.println("Enter your Location number: ");
+        int loc=sc.nextInt();
+        System.out.println("Registration Successful");
+        Customer cust=new Customer(userid,password,name,phone,loc);
+        cd.setCust(userid,cust);
+    }
+    public void login() {
+        System.out.println("Enter your UserID: ");
+        String user_id=sc.nextLine();
+        while(!cd.isValidCustomer(user_id)){
+            System.out.println("Invalid UserId,Please try again: ");
+            user_id=sc.nextLine();
+        }
+        System.out.println("Enter your Password: ");
+        String password=sc.nextLine();
+        while(!cd.getCust(user_id).getPassword().equals(password)){
+            System.out.println("Invalid Password,Please try again: ");
+            password=sc.nextLine();
+        }
+        System.out.println("Login Success");
+        display(user_id);
+    }
+    public void display(String user_id){
         while(true) {
             try {
                 System.out.println("Enter your choice");
@@ -30,7 +54,7 @@ public class Homepage {
                     viewMenu();
                 }
                 if(user_choice==2){
-                    Order();
+                    Order(user_id);
                 }
                 if(user_choice==3){
                     break;
@@ -40,21 +64,21 @@ public class Homepage {
                 System.out.println("Invalid Choice, Please Enter a Valid choice");
                 sc.next();
             }
-            
+
         }
     }
 
-    private void Order() {
+    private void Order(String user_id) {
         viewMenu();
         while(true) {
             try {
                 System.out.println("Enter your choice");
                 int choice = sc.nextInt();
-                if(it.hm.containsKey(choice)){
+                if(it.getHm().containsKey(choice)){
                     System.out.println("Enter the Quantity");
                     int qnt=sc.nextInt();
-                    cost+=(qnt*(it.hm.get(choice).getCost()));
-                    order.add(new ItemList(it.hm.get(choice).getName(),qnt,qnt*(it.hm.get(choice).getCost())));
+                    cost+=(qnt*(it.getHm().get(choice).getCost()));
+                    order.add(new ItemList(it.getHm().get(choice).getName(),qnt,qnt*(it.getHm().get(choice).getCost())));
                 }
                 else{
                     System.out.println("Invalid Choice, Please Enter a valid choice");
@@ -63,7 +87,7 @@ public class Homepage {
                 System.out.println("Do you want to order more, Press Y/y to continue &  Press N/n to Checkout");
                 char ext=sc.next().charAt(0);
                 if(ext=='N' || ext=='n'){
-                    orderCheckout();
+                    orderCheckout(user_id);
                     break;
                 }
             }
@@ -77,13 +101,14 @@ public class Homepage {
 
     }
 
-    private void orderCheckout() {
+    private void orderCheckout(String user_id) {
         while (true) {
             try {
                 System.out.println("Enter your choice");
                 System.out.println("Type 1: View Order Details");
                 System.out.println("Type 2: Edit the Order");
-                System.out.println("Type 3: Complete the Order");
+                System.out.println("Type 3: Add new Items");
+                System.out.println("Type 4: Complete the Order");
                 int order_choice = sc.nextInt();
                 if (order_choice == 1) {
                     viewOrder();
@@ -91,11 +116,14 @@ public class Homepage {
                 else if (order_choice == 2) {
                     editOrder();
                 }
-                else if (order_choice == 3) {
-                    placeOrder();
+                else if(order_choice==3){
+                    Order(user_id);
+                }
+                else if (order_choice == 4) {
+                    placeOrder(user_id);
                     break;
                 }
-                else if (order_choice < 1 || order_choice > 3) {
+                else if (order_choice < 1 || order_choice > 4) {
                     System.out.println("Invalid Choice, Please Enter  a valid choice");
                 }
             }
@@ -106,8 +134,19 @@ public class Homepage {
         }
     }
 
-    private void placeOrder() {
-
+    private void placeOrder(String user_id) {
+        try {
+            viewOrder();
+            System.out.println(cd.getHm().get(user_id));
+            ShortestDistance sd = new ShortestDistance();
+            int d = sd.ClosePath(cd.getCust(user_id).getLoc());
+            int time = (d / 20) * 60;
+            System.out.println("Thanks for your order");
+            System.out.println("It will be delivered in " + time + "Minutes");
+        }
+        catch (Exception e){
+            System.out.println("Something is Wrong,Can't Place the order"+e);
+        }
     }
 
     private void editOrder() {
@@ -139,8 +178,8 @@ public class Homepage {
     }
 
     private void viewMenu() {
-        for(int s:it.hm.keySet()){
-            System.out.println(it.hm.get(s).getName()+"->"+it.hm.get(s).getCost());
+        for(int s:it.getHm().keySet()){
+            System.out.println(s+" "+it.getHm().get(s).getName()+"->"+it.getHm().get(s).getCost());
         }
     }
     private void changeOrder(int in){
@@ -155,7 +194,7 @@ public class Homepage {
                 System.out.println("Enter the quantity");
                 int q = sc.nextInt();
                 order.get(in).qnt = q;
-                order.get(in).cost = q * (it.hm.get(in).getCost());
+                order.get(in).cost = q * (it.getHm().get(in).getCost());
             }
             else if (ed == 'Q' || ed == 'q') {
                 break;
